@@ -1,6 +1,7 @@
 const express=require("express");
 const app=express();
 const mongoose=require("mongoose")
+const path=require("path");
 const Listing=require("./models/listing.js");
 
 const port=8080;
@@ -16,6 +17,10 @@ main().then(()=>{
 async function main(){
     await mongoose.connect(MONGO_url);
 }
+
+app.set("view engine","ejs");
+app.set("views",path.join(__dirname,"views"));
+app.use(express.urlencoded({extended:true}));
 
 app.get("/testListing",async (req,res)=>{
     let sampleListing=new Listing({
@@ -33,6 +38,18 @@ app.get("/testListing",async (req,res)=>{
 app.get("/",(req,res)=>{
     res.send("Hi i am root!")
 })
+//index route
+app.get("/listings", async (req, res) => {
+    let allListings = await Listing.find({});
+    res.render("listings/index", { allListings });
+});
+//show route
+app.get("/listings/:id",async(req,res)=>{
+    let {id}=req.params;
+    const listing=await Listing.findById(id);
+    res.render("listings/show",{listing})
+});
+
 app.listen(port,()=>{
     console.log(`this is listening to port ${port}`)
 });
