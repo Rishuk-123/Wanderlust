@@ -43,12 +43,31 @@ app.get("/listings", async (req, res) => {
     let allListings = await Listing.find({});
     res.render("listings/index", { allListings });
 });
+
+//new route
+app.get("/listings/new",(req,res)=>{
+    res.render("listings/new.ejs");
+});
+
+//create route
+// CREATE route
+app.post("/listings", async (req, res) => {
+    console.log(req.body);           // check data coming
+    const newListing = new Listing(req.body.listing);
+    await newListing.save();         // save to MongoDB
+    res.redirect("/listings");       // go back to index page
+});
+
+
+
 //show route
 app.get("/listings/:id",async(req,res)=>{
     let {id}=req.params;
     const listing=await Listing.findById(id);
     res.render("listings/show",{listing})
 });
+
+
 
 app.listen(port,()=>{
     console.log(`this is listening to port ${port}`)
